@@ -79,7 +79,7 @@ func apiEmployeeUpdateById(c *gin.Context) {
 		}
 		employee.Id, _ = strconv.Atoi(id)
 		data.DB.Save(&employee)
-		c.JSON(http.StatusOK, employee)
+		c.IndentedJSON(http.StatusOK, employee)
 	}
 }
 
@@ -91,7 +91,7 @@ func apiEmployeeDeleteById(c *gin.Context) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "not found"})
 	} else {
 		data.DB.Delete(&employee)
-		c.JSON(http.StatusNoContent, employee)
+		c.IndentedJSON(http.StatusNoContent, employee)
 	}
 }
 func apiEmployeeAdd(c *gin.Context) {
