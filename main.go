@@ -1,13 +1,16 @@
 package main
 
 import (
+	"errors"
 	"net/http"
+	"strconv"
 
 	"math/rand"
 	"time"
 
 	"github.com/Pallinder/go-randomdata"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"systementor.se/yagolangapi/data"
 )
 
@@ -46,6 +49,66 @@ func addManyEmployees(c *gin.Context) {
 
 }
 
+func apiEmployee(c *gin.Context) {
+	var employees []data.Employee
+	data.DB.Find(&employees)
+
+	c.IndentedJSON(http.StatusOK, employees)
+}
+
+func apiEmployeeById(c *gin.Context) {
+	id := c.Param("id")
+	var employee data.Employee
+	err := data.DB.First(&employee, id).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "not found"})
+	} else {
+		c.IndentedJSON(http.StatusOK, employee)
+	}
+}
+
+func apiEmployeeUpdateById(c *gin.Context) {
+	id := c.Param("id")
+	var employee data.Employee
+	err := data.DB.First(&employee, id).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "not found"})
+	} else {
+		if err := c.BindJSON(&employee); err != nil {
+			return
+		}
+		employee.Id, _ = strconv.Atoi(id)
+		data.DB.Save(&employee)
+		c.JSON(http.StatusOK, employee)
+	}
+}
+
+func apiEmployeeDeleteById(c *gin.Context) {
+	id := c.Param("id")
+	var employee data.Employee
+	err := data.DB.First(&employee, id).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "not found"})
+	} else {
+		data.DB.Delete(&employee)
+		c.JSON(http.StatusNoContent, employee)
+	}
+}
+func apiEmployeeAdd(c *gin.Context) {
+	var employee data.Employee
+	if err := c.BindJSON(&employee); err != nil {
+		return
+	}
+	employee.Id = 0
+	err := data.DB.Create(&employee).Error
+	if err != nil {
+
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	} else {
+		c.IndentedJSON(http.StatusCreated, employee)
+	}
+}
+
 var config Config
 
 func main() {
@@ -62,6 +125,12 @@ func main() {
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/**")
 	router.GET("/", start)
+	router.GET("/api/employee", apiEmployee)
+	router.GET("/api/employee/:id", apiEmployeeById)
+	router.PUT("/api/employee/:id", apiEmployeeUpdateById)
+	router.DELETE("/api/employee/:id", apiEmployeeDeleteById)
+	router.POST("/api/employee", apiEmployeeAdd)
+
 	router.GET("/api/employees", employeesJson)
 	router.GET("/api/addemployee", addEmployee)
 	router.GET("/api/addmanyemployees", addManyEmployees)
