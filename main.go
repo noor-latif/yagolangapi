@@ -114,6 +114,13 @@ func apiEmployeeAdd(c *gin.Context) {
 	}
 }
 
+// Define a function to return a list of all employees' name and city
+func apiNoor(c *gin.Context) {
+	var employees []data.Employee
+	data.DB.Select("Namn, City").Find(&employees)
+	c.IndentedJSON(http.StatusOK, employees)
+}
+
 // Declare a global variable for the configuration
 var config Config
 
@@ -145,5 +152,6 @@ func main() {
 	router.GET("/api/employees", employeesJson)
 	router.GET("/api/addemployee", addEmployee)
 	router.GET("/api/addmanyemployees", addManyEmployees)
+	router.GET("/api/noor", apiNoor)
 	router.Run(":8080")
 }
