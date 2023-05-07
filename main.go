@@ -14,20 +14,21 @@ import (
 	"systementor.se/yagolangapi/data"
 )
 
+// Define a struct for the page view
 type PageView struct {
 	Title  string
 	Rubrik string
 }
 
+// Declare a global variable for the random number generator
 var theRandom *rand.Rand
 
+// Define a function to start the application
 func start(c *gin.Context) {
 	c.HTML(http.StatusOK, "home.html", &PageView{Title: "test", Rubrik: "Hej Golang"})
 }
 
-// HTML
-// JSON
-
+// Define a function to return employees in JSON format
 func employeesJson(c *gin.Context) {
 	var employees []data.Employee
 	data.DB.Find(&employees)
@@ -35,20 +36,20 @@ func employeesJson(c *gin.Context) {
 	c.JSON(http.StatusOK, employees)
 }
 
+// Define a function to add a single employee
 func addEmployee(c *gin.Context) {
-
 	data.DB.Create(&data.Employee{Age: theRandom.Intn(50) + 18, Namn: randomdata.FirstName(randomdata.RandomGender), City: randomdata.City()})
-
 }
 
+// Define a function to add multiple employees
 func addManyEmployees(c *gin.Context) {
 	//Here we create 10 Employees
 	for i := 0; i < 10; i++ {
 		data.DB.Create(&data.Employee{Age: theRandom.Intn(50) + 18, Namn: randomdata.FirstName(randomdata.RandomGender), City: randomdata.City()})
 	}
-
 }
 
+// Define a function to return employees in indented JSON format
 func apiEmployee(c *gin.Context) {
 	var employees []data.Employee
 	data.DB.Find(&employees)
@@ -56,6 +57,7 @@ func apiEmployee(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, employees)
 }
 
+// Define a function to return an employee by ID in indented JSON format
 func apiEmployeeById(c *gin.Context) {
 	id := c.Param("id")
 	var employee data.Employee
@@ -67,6 +69,7 @@ func apiEmployeeById(c *gin.Context) {
 	}
 }
 
+// Define a function to update an employee by ID in indented JSON format
 func apiEmployeeUpdateById(c *gin.Context) {
 	id := c.Param("id")
 	var employee data.Employee
@@ -83,6 +86,7 @@ func apiEmployeeUpdateById(c *gin.Context) {
 	}
 }
 
+// Define a function to delete an employee by ID in indented JSON format
 func apiEmployeeDeleteById(c *gin.Context) {
 	id := c.Param("id")
 	var employee data.Employee
@@ -94,6 +98,8 @@ func apiEmployeeDeleteById(c *gin.Context) {
 		c.IndentedJSON(http.StatusNoContent, employee)
 	}
 }
+
+// Define a function to add an employee in indented JSON format
 func apiEmployeeAdd(c *gin.Context) {
 	var employee data.Employee
 	if err := c.BindJSON(&employee); err != nil {
@@ -102,19 +108,24 @@ func apiEmployeeAdd(c *gin.Context) {
 	employee.Id = 0
 	err := data.DB.Create(&employee).Error
 	if err != nil {
-
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	} else {
 		c.IndentedJSON(http.StatusCreated, employee)
 	}
 }
 
+// Declare a global variable for the configuration
 var config Config
 
+// Define the main function
 func main() {
+	// Initialize the random number generator
 	theRandom = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	// Read the configuration file
 	readConfig(&config)
 
+	// Initialize the database
 	data.InitDatabase(config.Database.File,
 		config.Database.Server,
 		config.Database.Database,
@@ -122,6 +133,7 @@ func main() {
 		config.Database.Password,
 		config.Database.Port)
 
+	// Initialize the router
 	router := gin.Default()
 	router.LoadHTMLGlob("templates/**")
 	router.GET("/", start)
@@ -130,28 +142,8 @@ func main() {
 	router.PUT("/api/employee/:id", apiEmployeeUpdateById)
 	router.DELETE("/api/employee/:id", apiEmployeeDeleteById)
 	router.POST("/api/employee", apiEmployeeAdd)
-
 	router.GET("/api/employees", employeesJson)
 	router.GET("/api/addemployee", addEmployee)
 	router.GET("/api/addmanyemployees", addManyEmployees)
 	router.Run(":8080")
-
-	// e := data.Employee{
-	// 	Age:  1,
-	// 	City: "Strefabn",
-	// 	Namn: "wddsa",
-	// }
-
-	// if e.IsCool() {
-	// 	fmt.Printf("Namn is cool:%s\n", e.Namn)
-	// } else {
-	// 	fmt.Printf("Namn:%s\n", e.Namn)
-	// }
-
-	// fmt.Println("Hello")
-	// t := tabby.New()
-	// t.AddHeader("Namn", "Age", "City")
-	// t.AddLine("Stefan", "50", "Stockholm")
-	// t.AddLine("Oliver", "14", "Stockholm")
-	// t.Print()
 }
