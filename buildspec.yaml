@@ -15,11 +15,10 @@ version: 0.2
 #     key: secret-id:json-key:version-stage:version-id
 #   git-credential-helper: no | yes
 
-        
 phases:
   build:
     commands:
       - go test
-      - docker build -t git.systementor.se/yacloud/yagolangapi .
-      - docker login -u yacloud -p yacloud1 https://git.systementor.se
-      - docker push git.systementor.se/yacloud/yagolangapi 
+      - docker build -t git.systementor.se/noor.latif/noor-yagolangapi .
+      - docker login -u noor.latif -p yacloud1 https://git.systementor.se
+      - docker push git.systementor.se/noor.latif/noor-yagolangapi
