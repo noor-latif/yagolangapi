@@ -121,6 +121,10 @@ func apiNoor(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, employees)
 }
 
+func apiTest(c *gin.Context) {
+	c.String(http.StatusOK, "Hello World")
+}
+
 // Declare a global variable for the configuration
 var config Config
 
@@ -153,5 +157,6 @@ func main() {
 	router.GET("/api/addemployee", addEmployee)
 	router.GET("/api/addmanyemployees", addManyEmployees)
 	router.GET("/api/noor", apiNoor)
+	router.GET("/api/test", apiTest)
 	router.Run(":8080")
 }
