@@ -126,7 +126,7 @@ func apiTest(c *gin.Context) {
 }
 
 // Declare a global variable for the configuration
-var config Config
+//var config Config
 
 // Define the main function
 func main() {
@@ -134,15 +134,15 @@ func main() {
 	theRandom = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// Read the configuration file
-	readConfig(&config)
+	//	readConfig(&config)
 
 	// Initialize the database
-	data.InitDatabase(config.Database.File,
-		config.Database.Server,
-		config.Database.Database,
-		config.Database.Username,
-		config.Database.Password,
-		config.Database.Port)
+	/* data.InitDatabase(config.Database.File,
+	config.Database.Server,
+	config.Database.Database,
+	config.Database.Username,
+	config.Database.Password,
+	config.Database.Port) */
 
 	// Initialize the router
 	router := gin.Default()
