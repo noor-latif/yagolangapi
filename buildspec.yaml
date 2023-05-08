@@ -19,6 +19,6 @@ phases:
   build:
     commands:
       - go test
-      - docker build -t git.systementor.se/noor.latif/noor-yagolangapi .
-      - docker login -u noor.latif -p yacloud1 https://git.systementor.se
-      - docker push git.systementor.se/noor.latif/noor-yagolangapi
+      - docker build -t git.systementor.se/$GITEA_USERNAME/noor-yagolangapi .
+      - docker login -u $GITEA_USERNAME -p $GITEA_PASSWORD https://git.systementor.se
+      - docker push git.systementor.se/$GITEA_USERNAME/noor-yagolangapi
